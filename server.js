@@ -27,7 +27,7 @@ connectDB().then(() => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Use body-parser middleware
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -52,13 +52,11 @@ fs.readdirSync(routesPath).forEach(file => {
   app.use('/', route);
 });
 
-// // Serve static files from the React app
-// app.use(express.static(path.join(__dirname, 'client/build')));
-
-// // Catch-all handler to serve the React app for any other routes
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-// });
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ msg: 'Internal server error' });
+});
 
 // Create an HTTP server
 const server = http.createServer(app);

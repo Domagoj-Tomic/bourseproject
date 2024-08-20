@@ -10,19 +10,21 @@ require('../passportConfig');
 // Register a new user
 router.post('/register', async (req, res) => {
   const { name, email, password, isAdmin } = req.body;
+  console.log('Register request received:', req.body);
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await addUser(name, email, hashedPassword, isAdmin);
+    console.log('User created:', user);
     res.status(201).json(user);
   } catch (err) {
-    console.error(err.message);
+    console.error('Error during registration:', err.message);
     res.status(500).send('Server error');
   }
 });
 
 // Login a user
 router.post('/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
+  passport.authenticate('local', (err, user) => {
     if (err) {
       return next(err);
     }

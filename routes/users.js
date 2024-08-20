@@ -16,7 +16,7 @@ router.post('/register', async (req, res) => {
     user = new User({ name, email, password, isAdmin });
 
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+    user.passwordHash = await bcrypt.hash(password, salt);
 
     await user.save();
     res.status(201).json(user);
@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }

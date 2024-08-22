@@ -54,7 +54,7 @@ fs.readdirSync(routesPath).forEach(file => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error stack:', err.stack);
   res.status(500).json({ msg: 'Internal server error' });
 });
 

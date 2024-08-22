@@ -8,7 +8,7 @@ passport.use(new LocalStrategy({
   passwordField: 'password'
 }, async (email, password, done) => {
   try {
-    const res = await pool.query('SELECT * FROM user WHERE email = $1', [email]);
+    const res = await pool.query('SELECT * FROM "user" WHERE "email" = $1', [email]);
     const user = res.rows[0];
     if (!user) {
       return done(null, false, { message: 'Invalid credentials' });
@@ -19,6 +19,7 @@ passport.use(new LocalStrategy({
     }
     return done(null, user);
   } catch (err) {
+    console.error('Database query error:', err);
     return done(err);
   }
 }));
@@ -29,7 +30,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id, done) => {
   try {
-    const res = await pool.query('SELECT * FROM user WHERE id = $1', [id]);
+    const res = await pool.query('SELECT * FROM "user" WHERE id = $1', [id]);
     const user = res.rows[0];
     done(null, user);
   } catch (err) {

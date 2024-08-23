@@ -5,15 +5,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stocks</title>
+    <style>
+        .stock-list {
+            margin-top: 20px;
+        }
+
+        .stock-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .quote {
+            margin-top: 20px;
+        }
+
+        .cart {
+            margin-top: 20px;
+        }
+
+        .cart-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
 </head>
 
 <body>
     <%- include('partials/header') %>
         <div class="container">
             <h1>Stocks</h1>
-            <p>Here you can view and trade stocks.</p>
-            <!-- Add stock listing and trading functionality here -->
+            <div class="stock-list" id="stockList">
+                <!-- Stock items will be injected here by JavaScript -->
+            </div>
+            <div class="quote" id="quote">
+                <!-- Real-time stock quote will be displayed here -->
+            </div>
+            <div class="cart" id="cart">
+                <h2>Your Cart</h2>
+                <div id="cartItems">
+                    <!-- Cart items will be injected here by JavaScript -->
+                </div>
+                <button onclick="purchaseCart()">Purchase</button>
+            </div>
         </div>
+        <script>
+            async function fetchStocks() {
+                try {
+                    const response = await fetch('/api/stocks');
+                    const stocks = await response.json();
+                    const stocksList = document.getElementById('stockList');
+                    stocksList.innerHTML = stocks.map(stock => `
+                    <div class="stock-item">
+                        <h2>${stock.name} (${stock.symbol})</h2>
+                        <p>Price: ${stock.price}</p>
+                        <p>Date: ${new Date(stock.date).toLocaleString()}</p>
+                        <button onclick="addToCart(${stock.id}, 1)">Add to Cart</button>
+                    </div>
+                `).join('');
+                } catch (err) {
+                    console.error('Error fetching stocks:', err);
+                }
+            }
+
+            async function fetchCart() {
+                try {
+                    const response = await fetch('/api/cart?userId=1'); // Replace with actual user ID
+                    const cartItems = await response.json();
+                    const cartItemsDiv = document.getElementById('cartItems');
+                    cartItemsDiv.innerHTML = cartItems.map(item => `
+                    <div class="cart-item">
+                        <h3>${item.name} (${item.symbol})</h3>
+                        <p>Quantity: ${item.quantity}</p>
+                        <p>Price: ${item.price}</p>
+                    </div>
+                `).join('');
+                } catch (err) {
+                    console.error('Error fetching cart:', err);
+                }
+            }
+
+            async function addToCart(stockId, quantity) {
+                try {
+                    const response = await fetch('/api/cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ userId: 1, stockId, quantity }) // Replace with actual user ID
+                    });
+                    if (response.ok) {
+                        fetchCart();
+                    } else {
+                        console.error('Error adding to cart:', await response.json());
+                    }
+                } catch (err) {
+                    console.error('Error adding to cart:', err);
+                }
+            }
+
+            async function purchaseCart() {
+                try {
+                    const response = await fetch('/api/cart/purchase', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ userId: 1 }) // Replace with actual user ID
+                    });
+                    if (response.ok) {
+                        fetchCart();
+                    } else {
+                        console.error('Error purchasing cart:', await response.json());
+                    }
+                } catch (err) {
+                    console.error('Error purchasing cart:', err);
+                }
+            }
+
+            // Fetch stocks and cart on page load
+            fetchStocks();
+            fetchCart();
+
+            // Poll for updates every 5 minutes (300000 milliseconds)
+            setInterval(fetchStocks, 300000);
+        </script>
 </body>
 
 </html>

@@ -10,14 +10,18 @@
                 <li><a href="/stocks">Stocks</a></li>
                 <% if (user) { %>
                     <li class="divider"></li>
-                    <li><a href="/portfolio">Your Portfolio</a></li>
-                    <li class="right"><a href="/profile" class="username-link">
-                            <%= user.username %>
-                        </a></li>
-                    <% } else { %>
-                        <li class="divider"></li>
-                        <li class="right"><a href="/auth">Register/Login</a></li>
-                        <% } %>
+                    <% if (user.isAdmin) { %>
+                        <li><a href="/addStock">Add Stock</a></li>
+                        <% } else { %>
+                            <li><a href="/portfolio">Your Portfolio</a></li>
+                            <% } %>
+                                <li class="right"><a href="/profile" class="username-link">
+                                        <%= user.username %>
+                                    </a></li>
+                                <% } else { %>
+                                    <li class="divider"></li>
+                                    <li class="right"><a href="/auth">Register/Login</a></li>
+                                    <% } %>
             </ul>
         </nav>
     </div>

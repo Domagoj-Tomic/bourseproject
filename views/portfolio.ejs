@@ -11,8 +11,38 @@
     <%- include('partials/header') %>
         <div class="container">
             <h1>Your Portfolio</h1>
-            <p>Here you can view and manage your stock portfolio.</p>
-            <!-- Add portfolio management functionality here -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stock Symbol</th>
+                        <th>Stock Name</th>
+                        <th>Quantity</th>
+                        <th>Purchase Price</th>
+                        <th>Purchase Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% portfolio.forEach(item=> { %>
+                        <tr>
+                            <td>
+                                <%= item.symbol %>
+                            </td>
+                            <td>
+                                <%= item.name %>
+                            </td>
+                            <td>
+                                <%= item.quantity %>
+                            </td>
+                            <td>
+                                <%= item.purchase_price %>
+                            </td>
+                            <td>
+                                <%= item.purchase_date %>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
         </div>
 </body>
 

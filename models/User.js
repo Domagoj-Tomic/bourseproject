@@ -19,13 +19,13 @@ const createUserTable = async () => {
   }
 };
 
-const addUser = async (username, email, password, isAdmin = false) => {
+const addUser = async (username, email, password) => {
   const query = `
     INSERT INTO "user" ("username", "email", "passwordHash", "isAdmin")
     VALUES ($1, $2, $3, $4)
     RETURNING *;
   `;
-  const values = [username, email, password, isAdmin];
+  const values = [username, email, password, false];
   try {
     const res = await pool.query(query, values);
     console.log('User added to database:', res.rows[0]);

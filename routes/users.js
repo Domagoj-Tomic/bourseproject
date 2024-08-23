@@ -7,14 +7,14 @@ const User = require('../models/User');
 
 // Register a new user
 router.post('/register', async (req, res) => {
-  const { name, email, password, isAdmin } = req.body;
+  const { name, email, password } = req.body;
   try {
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ msg: 'User already exists' });
     }
 
-    user = new User({ name, email, password, isAdmin });
+    user = new User({ name, email, password, isAdmin: false });
 
     const salt = await bcrypt.genSalt(10);
     user.passwordHash = await bcrypt.hash(password, salt);
@@ -63,8 +63,12 @@ router.post('/login', async (req, res) => {
 
 // Logout a user
 router.post('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.redirect('/');
+  });
 });
 
 module.exports = router;

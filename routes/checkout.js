@@ -6,6 +6,7 @@ const { isAuthenticated } = require('../middleware/auth'); // Assuming you have 
 
 router.get('/checkout', isAuthenticated, async (req, res) => {
   const userId = req.user.id;
+  console.log('User ID:', userId);
   const cartItems = await getCart(userId);
 
   if (!cartItems || cartItems.length === 0) {

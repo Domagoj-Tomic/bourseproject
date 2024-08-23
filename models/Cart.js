@@ -52,6 +52,7 @@ const getCart = async (userId) => {
   const values = [userId];
   try {
     const cartRes = await pool.query(cartQuery, values);
+    console.log('Cart items:', cartRes.rows);
     return cartRes.rows;
   } catch (err) {
     console.error('Error fetching cart:', err);

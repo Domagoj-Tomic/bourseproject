@@ -22,13 +22,16 @@ header {
 header a {
     color: #fff;
     text-decoration: none;
-    text-transform: uppercase;
     font-size: 16px;
+    text-transform: uppercase;
 }
 
 header ul {
     padding: 0;
     list-style: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 header li {
@@ -44,4 +47,16 @@ header #branding {
 header #branding h1 {
     margin: 0;
     text-transform: none;
+}
+
+header nav ul li.right {
+    margin-left: auto;
+}
+
+.username-link {
+    text-transform: none;
+}
+
+header nav ul li.divider {
+    flex-grow: 1;
 }

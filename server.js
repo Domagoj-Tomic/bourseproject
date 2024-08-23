@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Configure session
 app.use(session({
-  secret: 'your-secret-key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false
 }));
@@ -41,6 +41,13 @@ app.use(session({
 // Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Middleware to set user in locals
+app.use((req, res, next) => {
+  console.log('User in session:', req.user);
+  res.locals.user = req.user;
+  next();
+});
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));

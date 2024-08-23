@@ -9,11 +9,11 @@ require('../passportConfig');
 
 // Register a new user
 router.post('/register', async (req, res) => {
-  const { name, email, password, isAdmin } = req.body;
+  const { username, email, password, isAdmin } = req.body;
   console.log('Register request received:', req.body);
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await addUser(name, email, hashedPassword, isAdmin);
+    const user = await addUser(username, email, hashedPassword, isAdmin);
     console.log('User created:', user);
     res.status(201).json(user);
   } catch (err) {
@@ -45,13 +45,8 @@ router.post('/login', (req, res, next) => {
   })(req, res, next);
 });
 
-router.get('/register', (req, res) => {
-  res.render('register');
-});
-
-
-router.get('/login', (req, res) => {
-  res.render('login');
+router.get('/auth', (req, res) => {
+    res.render('auth');
 });
 
 module.exports = router;

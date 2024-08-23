@@ -4,11 +4,14 @@ const bcrypt = require('bcryptjs');
 const { pool } = require('./db');
 
 passport.use(new LocalStrategy({
-  usernameField: 'email',
+  usernameField: 'identifier',
   passwordField: 'password'
-}, async (email, password, done) => {
+}, async (identifier, password, done) => {
   try {
-    const res = await pool.query('SELECT * FROM "user" WHERE "email" = $1', [email]);
+    const res = await pool.query(
+      'SELECT * FROM "user" WHERE "email" = $1 OR "username" = $1', 
+      [identifier]
+    );
     const user = res.rows[0];
     if (!user) {
       return done(null, false, { message: 'Invalid credentials' });

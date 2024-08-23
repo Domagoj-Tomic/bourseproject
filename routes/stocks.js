@@ -37,4 +37,9 @@ router.get('/quote', async (req, res) => {
   }
 });
 
+// Render the stocks page
+router.get('/stocks', (req, res) => {
+  res.render('stocks');
+});
+
 module.exports = router;

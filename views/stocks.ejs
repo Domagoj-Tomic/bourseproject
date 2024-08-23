@@ -49,6 +49,8 @@
             </div>
         </div>
         <script>
+            const userId = <%= user.id %>;
+
             async function fetchStocks() {
                 try {
                     const response = await fetch('/api/stocks');
@@ -69,7 +71,7 @@
 
             async function fetchCart() {
                 try {
-                    const response = await fetch('/api/cart?userId=1'); // Replace with actual user ID
+                    const response = await fetch(`/api/cart?userId=${userId}`);
                     const cartItems = await response.json();
                     const cartItemsDiv = document.getElementById('cartItems');
                     cartItemsDiv.innerHTML = cartItems.map(item => `
@@ -91,7 +93,7 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ userId: 1, stockId, quantity }) // Replace with actual user ID
+                        body: JSON.stringify({ userId, stockId, quantity })
                     });
                     if (response.ok) {
                         fetchCart();
@@ -110,7 +112,7 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ userId: 1 }) // Replace with actual user ID
+                        body: JSON.stringify({ userId })
                     });
                     if (response.ok) {
                         fetchCart();

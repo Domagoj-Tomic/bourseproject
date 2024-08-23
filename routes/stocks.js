@@ -105,7 +105,7 @@ router.get('/api/portfolio', async (req, res) => {
 });
 
 router.get('/stocks', (req, res) => {
-  res.render('stocks');
+  res.render('stocks', { user: req.user });
 });
 
 module.exports = router;

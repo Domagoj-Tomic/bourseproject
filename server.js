@@ -1,17 +1,22 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const fs = require('fs'); // File system operations
 const path = require('path'); // Handling file paths
 const session = require('express-session');
 const passport = require('passport');
+const helmet = require('helmet'); // Security middleware
 const { connectDB } = require('./db');
 const { createStockTable } = require('./models/Stock');
 const { createUserTable } = require('./models/User');
 const { createCartTable } = require('./models/Cart');
 const { createPortfolioTable } = require('./models/Portfolio');
+const nonceMiddleware = require('./middleware/nonce');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(nonceMiddleware);
 
 connectDB().then(() => {
   createUserTable().then(() => {
@@ -60,6 +65,19 @@ app.use((req, res, next) => {
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://*.js.stripe.com", "https://js.stripe.com", "https://maps.googleapis.com"],
+      connectSrc: ["'self'", "https://api.stripe.com", "https://maps.googleapis.com"],
+      frameSrc: ["'self'", "https://*.js.stripe.com", "https://js.stripe.com", "https://hooks.stripe.com"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  })
+);
 
 // Dynamically load routes
 const routesPath = path.join(__dirname, 'routes');

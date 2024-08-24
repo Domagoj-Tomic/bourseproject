@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { getCart } = require('../models/Cart');
+const { getCart, purchaseCart } = require('../models/Cart');
 const { isAuthenticated } = require('../middleware/auth'); // Assuming you have an auth middleware
 
 router.get('/checkout', isAuthenticated, async (req, res) => {
@@ -29,7 +29,7 @@ router.get('/checkout', isAuthenticated, async (req, res) => {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${req.protocol}://${req.get('host')}/checkout/success`,
+      success_url: `${req.protocol}://${req.get('host')}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.protocol}://${req.get('host')}/checkout/cancel`,
     });
 
@@ -40,8 +40,23 @@ router.get('/checkout', isAuthenticated, async (req, res) => {
   }
 });
 
-router.get('/checkout/success', (req, res) => {
-  res.render('checkoutSuccess');
+router.get('/checkout/success', isAuthenticated, async (req, res) => {
+  const userId = req.user.id;
+  const sessionId = req.query.session_id;
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (session.payment_status === 'paid') {
+      await purchaseCart(userId);
+      res.render('checkoutSuccess');
+    } else {
+      res.status(400).send('Payment not completed');
+    }
+  } catch (err) {
+    console.error('Error verifying payment:', err);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 router.get('/checkout/cancel', (req, res) => {

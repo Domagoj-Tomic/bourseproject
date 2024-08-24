@@ -5,11 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Successful</title>
+    <script>
+        setTimeout(function () {
+            window.location.href = '/';
+        }, 5000);
+    </script>
 </head>
 
 <body>
     <h1>Payment Successful</h1>
     <p>Thank you for your purchase! Your payment has been successfully processed.</p>
+    <p>You will be redirected to the home page in 5 seconds.</p>
+    <p>If you are not redirected, click the button below:</p>
+    <a href="/" class="button">Go to Home Page</a>
 </body>
 
 </html>

@@ -60,3 +60,25 @@ header nav ul li.right {
 header nav ul li.divider {
     flex-grow: 1;
 }
+
+.stock-list {
+    margin-top: 20px;
+}
+
+.stock-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.quote {
+    margin-top: 20px;
+}
+
+.cart {
+    margin-top: 20px;
+}
+
+.cart-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}

@@ -52,7 +52,6 @@ const getCart = async (userId) => {
   const values = [userId];
   try {
     const cartRes = await pool.query(cartQuery, values);
-    //console.log('Cart items:', cartRes.rows);
     return cartRes.rows;
   } catch (err) {
     console.error('Error fetching cart:', err);
@@ -61,17 +60,20 @@ const getCart = async (userId) => {
 };
 
 const purchaseCart = async (userId) => {
-  const purchaseQuery = `
-    DELETE FROM "cart"
-    WHERE user_id = $1
-    RETURNING *;
+  const getCartQuery = `
+    SELECT * FROM "cart"
+    WHERE user_id = $1;
   `;
   const values = [userId];
   try {
-    const purchaseRes = await pool.query(purchaseQuery, values);
-    const purchasedItems = purchaseRes.rows;
+    const cartRes = await pool.query(getCartQuery, values);
+    const cartItems = cartRes.rows;
 
-    for (const item of purchasedItems) {
+    if (cartItems.length === 0) {
+      throw new Error('No items in cart');
+    }
+
+    for (const item of cartItems) {
       const portfolioQuery = `
         INSERT INTO "portfolio" (user_id, stock_id, quantity, purchase_price, purchase_date)
         VALUES ($1, $2, $3, (SELECT price FROM "price_history" WHERE stock_id = $2 ORDER BY date DESC LIMIT 1), CURRENT_TIMESTAMP)
@@ -80,7 +82,9 @@ const purchaseCart = async (userId) => {
       await pool.query(portfolioQuery, portfolioValues);
     }
 
-    return purchasedItems;
+    // Removed code that deletes items from the cart
+
+    return cartItems;
   } catch (err) {
     console.error('Error purchasing cart:', err);
     throw err;

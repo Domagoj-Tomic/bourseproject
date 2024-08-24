@@ -1,27 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
     <script src="https://js.stripe.com/v3/"></script>
+    <script src="/js/stocks.js" defer></script>
 </head>
+
 <body>
     <h1>Checkout</h1>
-    <button id="checkout-button">Proceed to Payment</button>
-
-    <script>
-        const stripe = Stripe('<%= process.env.STRIPE_PUBLIC_KEY %>');
-
-        document.getElementById('checkout-button').addEventListener('click', () => {
-            stripe.redirectToCheckout({
-                sessionId: '<%= sessionId %>'
-            }).then((result) => {
-                if (result.error) {
-                    alert(result.error.message);
-                }
-            });
-        });
-    </script>
+    <button id="checkout-button" data-session-id="<%= sessionId %>">Proceed to Payment</button>
 </body>
+
 </html>

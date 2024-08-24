@@ -4,6 +4,8 @@ const axios = require('axios');
 const pool = require('../db').pool;
 const { addToCart, getCart, purchaseCart } = require('../models/Cart');
 const { getPortfolio } = require('../models/Portfolio');
+const { isAuthenticated } = require('../middleware/auth');
+const nonceMiddleware = require('../middleware/nonce');
 
 // Create a new stock
 router.post('/stocks', async (req, res) => {
@@ -61,8 +63,9 @@ router.get('/api/quote', async (req, res) => {
 });
 
 // Add stock to cart
-router.post('/api/cart', async (req, res) => {
-  const { userId, stockId, quantity } = req.body;
+router.post('/api/cart', isAuthenticated, async (req, res) => {
+  const { stockId, quantity } = req.body;
+  const userId = req.user.id;
   try {
     const cartItem = await addToCart(userId, stockId, quantity);
     res.status(201).json(cartItem);
@@ -72,8 +75,8 @@ router.post('/api/cart', async (req, res) => {
 });
 
 // Get cart items
-router.get('/api/cart', async (req, res) => {
-  const { userId } = req.query;
+router.get('/api/cart', isAuthenticated, async (req, res) => {
+  const userId = req.user.id;
   try {
     const cartItems = await getCart(userId);
     res.status(200).json(cartItems);
@@ -83,11 +86,35 @@ router.get('/api/cart', async (req, res) => {
 });
 
 // Purchase cart items
-router.post('/api/cart/purchase', async (req, res) => {
-  const { userId } = req.body;
+router.post('/api/cart/purchase', isAuthenticated, async (req, res) => {
+  const userId = req.user.id;
   try {
-    const purchasedItems = await purchaseCart(userId);
-    res.redirect('/checkout');
+    const cartItems = await getCart(userId);
+
+    if (!cartItems || cartItems.length === 0) {
+      return res.status(400).json({ error: 'No items in cart' });
+    }
+
+    const lineItems = cartItems.map(item => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.name,
+        },
+        unit_amount: Math.round(item.price * 100), // Stripe expects the amount in cents
+      },
+      quantity: item.quantity,
+    }));
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: `${req.protocol}://${req.get('host')}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.protocol}://${req.get('host')}/checkout/cancel`,
+    });
+
+    res.status(200).json({ success: true, redirectUrl: session.url });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -104,8 +131,11 @@ router.get('/api/portfolio', async (req, res) => {
   }
 });
 
-router.get('/stocks', (req, res) => {
-  res.render('stocks', { user: req.user });
+router.get('/stocks', isAuthenticated, nonceMiddleware, (req, res) => {
+  if (!req.user) {
+    return res.status(401).send('User not authenticated');
+  }
+  res.render('stocks', { user: req.user, nonce: res.locals.nonce });
 });
 
 module.exports = router;

@@ -14,27 +14,22 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 connectDB().then(() => {
-  console.log('Connected to PostgreSQL');
   createUserTable().then(() => {
-    console.log('User table creation checked');
   }).catch(err => {
     console.error('Error during user table creation:', err);
   });
 
   createStockTable().then(() => {
-    console.log('Stock table creation checked');
   }).catch(err => {
     console.error('Error during stock table creation:', err);
   });
 
   createCartTable().then(() => {
-    console.log('Cart table creation checked');
   }).catch(err => {
     console.error('Error during cart table creation:', err);
   });
   
   createPortfolioTable().then(() => {
-    console.log('Portfolio table creation checked');
   }).catch(err => {
     console.error('Error during portfolio table creation:', err);
   });
@@ -58,7 +53,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
-  console.log('User in session:', req.user);
+  //console.log('User in session:', req.user);
   res.locals.user = req.user;
   next();
 });

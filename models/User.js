@@ -28,7 +28,6 @@ const addUser = async (username, email, password) => {
   const values = [username, email, password, false];
   try {
     const res = await pool.query(query, values);
-    console.log('User added to database:', res.rows[0]);
     return res.rows[0];
   } catch (err) {
     if (err.code === '23505' && err.constraint === 'user_email_key') {

@@ -10,11 +10,11 @@ require('../passportConfig');
 // Register a new user
 router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
-  console.log('Register request received:', req.body);
+  //console.log('Register request received:', req.body);
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await addUser(username, email, hashedPassword);
-    console.log('User created:', user);
+    //console.log('User created:', user);
     res.redirect('/auth?success=1');
   } catch (err) {
     console.error('Error during registration:', err.message);

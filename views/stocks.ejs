@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stocks</title>
-    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/v3/" defer></script>
     <script src="/js/stocks.js" defer></script>
 </head>
 
 <body>
     <%- include('partials/header') %>
-        <div class="container" data-stripe-public-key="<%= process.env.STRIPE_PUBLIC_KEY %>">
+        <div id="container" data-stripe-public-key="<%= process.env.STRIPE_PUBLIC_KEY %>" data-user-id="<%= user.id %>">
             <h1>Stocks</h1>
             <div class="stock-list" id="stockList">
                 <!-- Stock items will be injected here by JavaScript -->

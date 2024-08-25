@@ -4,12 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const stripe = Stripe(container.getAttribute('data-stripe-public-key'));
     const openaiKey = container.getAttribute('data-openai-key');
 
-        async function fetchStocks() {
+    async function fetchStocks() {
         try {
             const response = await fetch('/api/stocks');
             const stocks = await response.json();
             displayStocks(stocks);
-    
+
             const searchInput = document.getElementById('stockSearch');
             searchInput.addEventListener('input', () => {
                 const query = searchInput.value.toLowerCase();
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching stocks:', err);
         }
     }
-    
+
     function displayStocks(stocks) {
         const stocksList = document.getElementById('stockList');
         stocksList.innerHTML = stocks.map(stock => `
@@ -114,12 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchRecommendations() {
         try {
-            // Fetch the user's portfolio
             const portfolioResponse = await fetch('/api/portfolio');
             const portfolio = await portfolioResponse.json();
             const ownedStocks = portfolio.map(stock => stock.symbol);
 
-            // Fetch recommendations from OpenAI
             const response = await axios.post('https://api.openai.com/v1/chat/completions', {
                 model: 'gpt-3.5-turbo',
                 messages: [
@@ -151,8 +149,26 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
+    async function emptyCart() {
+        try {
+            const response = await fetch('/api/cart/empty', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.ok) {
+                fetchCart();
+            } else {
+                console.error('Error emptying cart:', await response.json());
+            }
+        } catch (err) {
+            console.error('Error emptying cart:', err);
+        }
+    }
 
     document.getElementById('purchaseButton').addEventListener('click', purchaseCart);
+    document.getElementById('emptyCartButton').addEventListener('click', emptyCart);
 
     // Fetch stocks and cart on page load
     fetchStocks();

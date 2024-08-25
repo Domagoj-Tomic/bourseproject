@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const pool = require('../db').pool;
-const { addToCart, getCart, purchaseCart } = require('../models/Cart');
+const { addToCart, getCart, purchaseCart, emptyCart } = require('../models/Cart');
 const { getPortfolio } = require('../models/Portfolio');
 const { isAuthenticated } = require('../middleware/auth');
 const nonceMiddleware = require('../middleware/nonce');
@@ -126,6 +126,17 @@ router.post('/api/cart/purchase', isAuthenticated, async (req, res) => {
         console.error('Error purchasing cart:', err);
         res.status(500).json({ error: err.message });
     }
+});
+
+router.post('/api/cart/empty', isAuthenticated, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    await emptyCart(userId);
+    res.status(200).send({ success: true });
+  } catch (err) {
+    console.error('Error emptying cart:', err);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // Get user portfolio

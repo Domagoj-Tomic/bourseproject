@@ -1,4 +1,6 @@
 const pool = require('../db').pool;
+const { addStock } = require('../models/Stock');
+const axios = require('axios');
 
 const createCartTable = async () => {
   const cartTableQuery = `
@@ -60,33 +62,44 @@ const getCart = async (userId) => {
 };
 
 const purchaseCart = async (userId) => {
-  const getCartQuery = `
-    SELECT * FROM "cart"
-    WHERE user_id = $1;
-  `;
-  const values = [userId];
   try {
-    const cartRes = await pool.query(getCartQuery, values);
-    const cartItems = cartRes.rows;
-
-    if (cartItems.length === 0) {
-      throw new Error('No items in cart');
-    }
-
+    const cartItems = await getCart(userId);
     for (const item of cartItems) {
+      // Fetch the current price from the API
+      const response = await axios.get(`${process.env.BASE_URL}/api/quote`, {
+        params: { symbol: item.symbol }
+      });
+      const currentPrice = response.data.currentPrice;
+
+      // Add the stock and its current price to the database
+      await addStock(item.symbol, item.name, currentPrice);
+
+      // Insert the stock into the user's portfolio
       const portfolioQuery = `
         INSERT INTO "portfolio" (user_id, stock_id, quantity, purchase_price, purchase_date)
-        VALUES ($1, $2, $3, (SELECT price FROM "price_history" WHERE stock_id = $2 ORDER BY date DESC LIMIT 1), CURRENT_TIMESTAMP)
+        VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)
       `;
-      const portfolioValues = [userId, item.stock_id, item.quantity];
+      const portfolioValues = [userId, item.stock_id, item.quantity, currentPrice];
       await pool.query(portfolioQuery, portfolioValues);
     }
 
-    // Removed code that deletes items from the cart
+    // Empty the cart after purchase
+    const emptyCartQuery = 'DELETE FROM "cart" WHERE user_id = $1';
+    await pool.query(emptyCartQuery, [userId]);
 
     return cartItems;
   } catch (err) {
     console.error('Error purchasing cart:', err);
+    throw err;
+  }
+};
+
+const emptyCart = async (userId) => {
+  try {
+    const emptyCartQuery = 'DELETE FROM "cart" WHERE user_id = $1';
+    await pool.query(emptyCartQuery, [userId]);
+  } catch (err) {
+    console.error('Error emptying cart:', err);
     throw err;
   }
 };
@@ -96,4 +109,5 @@ module.exports = {
   addToCart,
   getCart,
   purchaseCart,
+  emptyCart,
 };

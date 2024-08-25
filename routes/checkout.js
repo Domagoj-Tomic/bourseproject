@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { getCart, purchaseCart } = require('../models/Cart');
-const { isAuthenticated } = require('../middleware/auth'); // Assuming you have an auth middleware
+const { isAuthenticated } = require('../middleware/auth');
 
 router.get('/checkout', isAuthenticated, async (req, res) => {
   const userId = req.user.id;

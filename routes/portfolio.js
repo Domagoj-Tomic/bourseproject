@@ -14,4 +14,15 @@ router.get('/portfolio', isAuthenticated, async (req, res) => {
   }
 });
 
+router.get('/api/portfolio', isAuthenticated, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const portfolio = await getPortfolio(userId);
+    res.json(portfolio);
+  } catch (err) {
+    console.error('Error fetching portfolio:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 module.exports = router;

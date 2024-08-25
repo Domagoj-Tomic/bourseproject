@@ -70,8 +70,8 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "https://*.js.stripe.com", "https://js.stripe.com", "https://maps.googleapis.com"],
-      connectSrc: ["'self'", "https://api.stripe.com", "https://maps.googleapis.com"],
+      scriptSrc: ["'self'", "https://*.js.stripe.com", "https://js.stripe.com", "https://maps.googleapis.com", "https://cdn.jsdelivr.net"],
+      connectSrc: ["'self'", "https://api.stripe.com", "https://maps.googleapis.com", "https://api.openai.com"],
       frameSrc: ["'self'", "https://*.js.stripe.com", "https://js.stripe.com", "https://hooks.stripe.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],

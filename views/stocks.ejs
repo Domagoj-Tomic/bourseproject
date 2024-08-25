@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stocks</title>
     <script src="https://js.stripe.com/v3/" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
     <script src="/js/stocks.js" defer></script>
 </head>
 
 <body>
     <%- include('partials/header') %>
         <div id="container" class="container" data-stripe-public-key="<%= process.env.STRIPE_PUBLIC_KEY %>"
-            data-user-id="<%= user.id %>">
+            data-user-id="<%= user.id %>" data-openai-key="<%= process.env.OPENAI_KEY %>">
             <h1>Stocks</h1>
             <input type="text" id="stockSearch" placeholder="Search stocks...">
             <div class="stock-list" id="stockList">

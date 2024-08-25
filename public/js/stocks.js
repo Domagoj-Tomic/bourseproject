@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('container');
     const userId = container.getAttribute('data-user-id');
     const stripe = Stripe(container.getAttribute('data-stripe-public-key'));
-    const axios = require('axios');
+    const openaiKey = container.getAttribute('data-openai-key');
 
         async function fetchStocks() {
         try {
@@ -112,36 +112,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function fetchRecommendations(userId) {
-    try {
-        const response = await axios.post('https://api.openai.com/v1/engines/davinci-codex/completions', {
-            prompt: `Provide stock recommendations for user with ID ${userId}`,
-            max_tokens: 100,
-            n: 1,
-            stop: null,
-            temperature: 0.7
-        }, {
-            headers: {
-                'Authorization': `Bearer YOUR_OPENAI_API_KEY`,
-                'Content-Type': 'application/json'
-            }
-        });
+    async function fetchRecommendations() {
+        try {
+            // Fetch the user's portfolio
+            const portfolioResponse = await fetch('/api/portfolio');
+            const portfolio = await portfolioResponse.json();
+            const ownedStocks = portfolio.map(stock => stock.symbol);
 
-        const recommendations = response.data.choices[0].text.trim().split('\n');
-        displayRecommendations(recommendations);
-            } catch (err) {
-                console.error('Error fetching recommendations:', err);
-            }
-        }
+            // Fetch recommendations from OpenAI
+            const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+                model: 'gpt-3.5-turbo',
+                messages: [
+                    { role: 'system', content: 'You are a stock recommendation assistant.' },
+                    { role: 'user', content: `Provide stock recommendations. The user already owns the following stocks: ${ownedStocks.join(', ')}.` }
+                ],
+                max_tokens: 100,
+                temperature: 0.7
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${openaiKey}`,
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        function displayRecommendations(recommendations) {
-            const recommendationsDiv = document.getElementById('recommendations');
-            recommendationsDiv.innerHTML = recommendations.map(rec => `
-                <div class="recommendation-item">
-                    <p>${rec}</p>
-                </div>
-            `).join('');
+            const recommendations = response.data.choices[0].message.content.trim().split('\n');
+            displayRecommendations(recommendations);
+        } catch (err) {
+            console.error('Error fetching recommendations:', err);
         }
+    }
+
+    function displayRecommendations(recommendations) {
+        const recommendationsDiv = document.getElementById('recommendations');
+        recommendationsDiv.innerHTML = recommendations.map(rec => `
+            <div class="recommendation-item">
+                <p>${rec}</p>
+            </div>
+        `).join('');
+    }
+
 
     document.getElementById('purchaseButton').addEventListener('click', purchaseCart);
 

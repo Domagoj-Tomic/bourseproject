@@ -90,9 +90,9 @@ router.get('/api/cart', isAuthenticated, async (req, res) => {
 router.post('/api/cart/purchase', isAuthenticated, async (req, res) => {
     const userId = req.user.id;
     try {
-        console.log(`User ID: ${userId}`);
+        //console.log(`User ID: ${userId}`);
         const cartItems = await getCart(userId);
-        console.log(`Cart Items: ${JSON.stringify(cartItems)}`);
+        //console.log(`Cart Items: ${JSON.stringify(cartItems)}`);
 
         if (!cartItems || cartItems.length === 0) {
             return res.status(400).json({ error: 'No items in cart' });
@@ -109,7 +109,7 @@ router.post('/api/cart/purchase', isAuthenticated, async (req, res) => {
             quantity: item.quantity,
         }));
 
-        console.log(`Line Items: ${JSON.stringify(lineItems)}`);
+        //console.log(`Line Items: ${JSON.stringify(lineItems)}`);
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -119,7 +119,7 @@ router.post('/api/cart/purchase', isAuthenticated, async (req, res) => {
             cancel_url: `${req.protocol}://${req.get('host')}/checkout/cancel`,
         });
 
-        console.log(`Stripe Session: ${JSON.stringify(session)}`);
+        //console.log(`Stripe Session: ${JSON.stringify(session)}`);
 
         res.status(200).json({ success: true, redirectUrl: session.url });
     } catch (err) {

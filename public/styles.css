@@ -82,3 +82,12 @@ header nav ul li.divider {
     padding: 10px;
     border-bottom: 1px solid #ccc;
 }
+
+.recommendations {
+    margin-top: 20px;
+}
+
+.recommendation-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}

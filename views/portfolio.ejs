@@ -5,12 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Portfolio</title>
+    <script src="/js/portfolio.js" defer></script>
 </head>
 
 <body>
     <%- include('partials/header') %>
         <div class="container">
             <h1>Your Portfolio</h1>
+            <input type="text" id="portfolioSearch" placeholder="Search portfolio...">
             <table>
                 <thead>
                     <tr>
@@ -21,13 +23,13 @@
                         <th>Purchase Date</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="portfolioTableBody">
                     <% portfolio.forEach(item=> { %>
                         <tr>
-                            <td>
+                            <td class="symbol">
                                 <%= item.symbol %>
                             </td>
-                            <td>
+                            <td class="name">
                                 <%= item.name %>
                             </td>
                             <td>

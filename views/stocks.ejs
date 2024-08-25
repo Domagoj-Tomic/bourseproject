@@ -11,18 +11,20 @@
 
 <body>
     <%- include('partials/header') %>
-        <div id="container" data-stripe-public-key="<%= process.env.STRIPE_PUBLIC_KEY %>" data-user-id="<%= user.id %>">
+        <div id="container" class="container" data-stripe-public-key="<%= process.env.STRIPE_PUBLIC_KEY %>"
+            data-user-id="<%= user.id %>">
             <h1>Stocks</h1>
+            <input type="text" id="stockSearch" placeholder="Search stocks...">
             <div class="stock-list" id="stockList">
-                <!-- Stock items will be injected here by JavaScript -->
             </div>
             <div class="quote" id="quote">
-                <!-- Real-time stock quote will be displayed here -->
+            </div>
+            <div id="recommendations" class="recommendations">
+                <h2>Recommended Stocks</h2>
             </div>
             <div class="cart" id="cart">
                 <h2>Your Cart</h2>
                 <div id="cartItems">
-                    <!-- Cart items will be injected here by JavaScript -->
                 </div>
                 <button id="purchaseButton">Purchase</button>
             </div>
